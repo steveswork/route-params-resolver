@@ -1,2 +1,2 @@
 # Route-Params-Resolver
-Resolves route path params to convert route into a valid URI 
+Hassle free args to params mapper: resolves route path params to convert a route into a valid URI.
