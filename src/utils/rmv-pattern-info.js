@@ -19,8 +19,8 @@ const manageParensStack = ( path, start, openParensStack ) => {
 		}
 		if( path[ pos ] === ')' && openParensStack.length ) {
 			return {
-				topCloseParenPos: pos,
-				topOpenParensPos: openParensStack.pop()
+				close: pos,
+				open: openParensStack.pop()
 			};
 		}
 	}
@@ -40,10 +40,7 @@ const rmvPatternInfo = routePath => {
 		if( closedSegmentRange === null ) {
 			return path;
 		}
-		const {
-			topCloseParenPos: close,
-			topOpenParensPos: open
-		} = closedSegmentRange;
+		const { close, open } = closedSegmentRange;
 		cursorPos = open;
 		path = `${ path.slice( 0, open ) }${ path.slice( close + 1 ) }`
 	} while( true );

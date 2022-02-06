@@ -49,7 +49,7 @@ export const trimUri = uri => {
 
 /**
  * @typedef {{
- * 		topCloseParenPos: number,
- * 		topOpenParensPos: number
+ * 		close: number,
+ * 		open: number
  * }} TopStackBlock
  */
