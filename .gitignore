@@ -5,3 +5,4 @@ node_modules
 report.*.json
 npm-debug.log*
 dist
+debug.log
