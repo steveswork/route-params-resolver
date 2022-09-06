@@ -20,9 +20,13 @@ npm i -S @webkrafters/route-params-resolver
     </p>
   </div>
   
+  <p><code>resolve('/test/demo'); // '/test/demo'</code></p>
+  
+  <p><code>resolve('/test/demo/'); // '/test/demo'</code></p>
+  
   <p><code>resolve('/test/demo', 1, 2, 3); // '/test/demo'</code></p>
   
-  <p><code>resolve('/test/demo/, 1, 2, 3); // '/test/demo'</code></p>
+  <p><code>resolve('/test/demo/', 1, 2, 3); // '/test/demo'</code></p>
 
   <p><code>resolve('/test/demo/:first/:second/:third', 1, 2, 3); // '/test/demo/1/2/3'</code></p>
   
@@ -41,8 +45,18 @@ npm i -S @webkrafters/route-params-resolver
   <p><code>resolve('/test/demo/:first/:second([a-f0-9])/:third([A-Za-z]{24})?/:fourth', 1, null, 3, {a: 'b'}, undefined); // '/test/demo/1/null/3/{"a":"b"}'</code></p>
 
   <p><code>resolve('/test/demo/:first/:second/:third', [ 1, 2, 3 ], new Date( 1643935827014 ), true); // '/test/demo/[1,2,3]/"2022-02-04T00:50:27.014Z"/true'</code></p>
+    
+  <p><code>resolve('/test/demo/:first/:second/*', 1, 2, 3, 4, 5 ); // '/test/demo/1/2/3/4/5'</code></p>
+    
+  <p><code>resolve('/test/demo/:first/*/test/*', 1, 2, 3, 4, 5 ); // '/test/demo/1/*/test/2/3/4/5'</code></p>
+    
+  <p><code>resolve('/test/demo/:first/*/test/*', 1 ); // '/test/demo/1/*/test'</code></p>
+
+  <p><code>resolve('/test/demo/:first/*/test/*'); // '/test/demo/undefined/*/test'</code></p>
+
+  <p><code>resolve('/test/demo/*', undefined, 4, undefined, true, undefined, null, undefined, undefined ); // '/test/demo/undefined/4/undefined/true/undefined/null'</code></p>
 
 ## License
 
 	ISC
-
+  

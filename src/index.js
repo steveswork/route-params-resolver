@@ -1,4 +1,5 @@
 import isObject from 'lodash.isobject';
+import isString from 'lodash.isstring';
 
 import TimedMap from '@webkrafters/timed-map';
 
@@ -18,27 +19,26 @@ const uriMemo = new TimedMap();
  * @returns {string}
  */
 const resolve = ( routePath, ...routeArgs ) => {
-	!pathParamNamesMemo.has( routePath ) &&
-		pathParamNamesMemo.put(
-			routePath, getRouteParams(
-				rmvPatternInfo( routePath )
-			)
-		);
+	let routePathNoPattern;
+	if( !pathParamNamesMemo.has( routePath ) ) {
+		routePathNoPattern = rmvPatternInfo( routePath );
+		pathParamNamesMemo.put( routePath, getRouteParams(
+			routePathNoPattern
+		) );
+	}
 	const args = routeArgs.map( arg => (
 		isObject( arg )
 			? JSON.stringify( arg )
-			: arg
+			: !isString( arg )
+				? `${ arg }`
+				: arg
 	) );
-	const routeInfoString = JSON.stringify(
-		{ routePath, args }, ( k, v ) => (
-			typeof v === 'undefined'
-				? 'undefined'
-				: v
-		)
-	);
+
+	const routeInfoString = JSON.stringify({ routePath, args });
+
 	!uriMemo.has( routeInfoString ) && uriMemo.put(
 		routeInfoString, trimUri( route2Uri(
-			rmvPatternInfo( routePath ),
+			routePathNoPattern || rmvPatternInfo( routePath ),
 			pathParamNamesMemo.get( routePath ),
 			args
 		) )

@@ -60,6 +60,31 @@ const INPUT_LIST = Object.freeze([{
 	path: '/test/demo/:first/:second/:third',
 	test: 12,
 	uri: '/test/demo/[1,2,3]/"2022-02-04T00:50:27.014Z"/true'
+}, {
+	args: [ 1, 2, 3, 4, 5 ],
+	path: '/test/demo/:first/:second/*',
+	test: 13,
+	uri: '/test/demo/1/2/3/4/5'
+}, {
+	args: [ 1, 2, 3, 4, 5 ],
+	path: '/test/demo/:first/*/test/*',
+	test: 14,
+	uri: '/test/demo/1/*/test/2/3/4/5'
+}, {
+	args: [ 1 ],
+	path: '/test/demo/:first/*/test/*',
+	test: 15,
+	uri: '/test/demo/1/*/test'
+}, {
+	args: [],
+	path: '/test/demo/:first/*/test/*',
+	test: 16,
+	uri: '/test/demo/undefined/*/test'
+}, {
+	args: [ undefined, 4, undefined, true, undefined, null, undefined, undefined ],
+	path: '/test/demo/*',
+	test: 17,
+	uri: '/test/demo/undefined/4/undefined/true/undefined/null'
 }]);
 
 describe( 'RouteParamsResolver', () => {

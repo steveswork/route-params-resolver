@@ -28,6 +28,8 @@ const manageParensStack = ( path, start, openParensStack ) => {
 };
 
 /**
+ * Strips all url param regex substrings from the route path
+ *
  * @param {string} routePath
  * @returns {string}
  */

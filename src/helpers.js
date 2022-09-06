@@ -1,8 +1,9 @@
-const ROUTE_PARAM_GLOBAL_PATTERN = /:[^:\/]+/g;
 const DANGLING_RANGE_PARAM_CONNECTOR_PATTERN = /[\.\-]$/;
+const ROUTE_PARAM_GLOBAL_PATTERN = /:[^:\/]+/g;
 const UNDEFINED_URI_ENDINGS_PATTERN = (
 	/\/(undefined|undefined-undefined|undefined\.undefined)\/*$/
 );
+const VARIADIC_PATTERN = /\/\*\s*$/;
 
 /** @type {(routePath: string) => string[]} */
 export const getRouteParams = routePath => ((
@@ -25,7 +26,11 @@ export const route2Uri = ( routePath, params, args ) => {
 	for( let p = 0; p < _args.length; p++ ) {
 		path = path.replace( params[ p ], _args[ p ] );
 	}
-	return path;
+	const pathLen = path.length;
+	path = path.replace( VARIADIC_PATTERN, '' );
+	return path.length !== pathLen && args.length > params.length
+		? `${ path }/${ args.slice( params.length ).join( '/' ) }`
+		: path;
 };
 
 /**
