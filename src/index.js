@@ -3,8 +3,9 @@ import isString from 'lodash.isstring';
 
 import TimedMap from '@webkrafters/timed-map';
 
-import rmvPatternInfo from './utils/rmv-pattern-info';
+import extractPathInfo from './utils/extract-path-info';
 import {
+	applyRegexValidation,
 	getRouteParams,
 	route2Uri,
 	trimUri
@@ -19,12 +20,13 @@ const uriMemo = new TimedMap();
  * @returns {string}
  */
 const resolve = ( routePath, ...routeArgs ) => {
-	let routePathNoPattern;
+	/** @type {PathInfo} */ let info;
 	if( !pathParamNamesMemo.has( routePath ) ) {
-		routePathNoPattern = rmvPatternInfo( routePath );
-		pathParamNamesMemo.put( routePath, getRouteParams(
-			routePathNoPattern
-		) );
+		info = extractPathInfo( routePath );
+		pathParamNamesMemo.put(
+			routePath,
+			getRouteParams( info.path )
+		);
 	}
 	const args = routeArgs.map( arg => (
 		isObject( arg )
@@ -33,14 +35,13 @@ const resolve = ( routePath, ...routeArgs ) => {
 				? `${ arg }`
 				: arg
 	) );
-
+	info = info || extractPathInfo( routePath );
+	const paramNames = pathParamNamesMemo.get( routePath );
+	applyRegexValidation( routePath, info, paramNames, args );
 	const routeInfoString = JSON.stringify({ routePath, args });
-
 	!uriMemo.has( routeInfoString ) && uriMemo.put(
 		routeInfoString, trimUri( route2Uri(
-			routePathNoPattern || rmvPatternInfo( routePath ),
-			pathParamNamesMemo.get( routePath ),
-			args
+			info.path, paramNames, args
 		) )
 	);
 	return uriMemo.get( routeInfoString );
@@ -49,3 +50,4 @@ const resolve = ( routePath, ...routeArgs ) => {
 export default resolve;
 
 /** @typedef {import("./helpers").ArgType} ArgType */
+/** @typedef {import("./utils/extract-path-info").PathInfo} PathInfo */

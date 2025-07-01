@@ -102,5 +102,5 @@
     "test": "eslint --fix && jest --watchAll"
   },
   "types": "dist/types/index.d.ts",
-  "version": "1.1.2"
+  "version": "1.1.3"
 }

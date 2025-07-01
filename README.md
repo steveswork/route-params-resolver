@@ -4,7 +4,7 @@ Hassle free args-to-params mapper: resolves route path params to convert a route
 - Clunk-free<br />
 
 <h4><u>Install</u></h4>
-npm i -S @webkrafters/route-params-resolver
+npm install --save @webkrafters/route-params-resolver
 
 <h3>Usage:</h3>
   <p><code>import resolve from '@webkrafters/route-params-resolver';</code></p>
@@ -41,8 +41,8 @@ npm i -S @webkrafters/route-params-resolver
   <p><code>resolve('/test/demo/:first/:second/:third/:fourth', 1, null, null, null); // '/test/demo/1/null/null/null'</code></p>
   
   <p><code>resolve('/test/demo/:first/:second/:third/:fourth', undefined, null, undefined, undefined, undefined); // '/test/demo/undefined/null'</code></p>
-  
-  <p><code>resolve('/test/demo/:first/:second([a-f0-9])/:third([A-Za-z]{24})?/:fourth', 1, null, 3, {a: 'b'}, undefined); // '/test/demo/1/null/3/{"a":"b"}'</code></p>
+
+  <p><code>resolve('/test/demo/:first/:second([A-Za-z]{3,})/:third([a-f0-9])?/:fourth', 1, null, 3, {a: 'b'}, undefined); // '/test/demo/1/null/3/{"a":"b"}'</code></p>
 
   <p><code>resolve('/test/demo/:first/:second/:third', [ 1, 2, 3 ], new Date( 1643935827014 ), true); // '/test/demo/[1,2,3]/"2022-02-04T00:50:27.014Z"/true'</code></p>
     

@@ -31,23 +31,37 @@ const manageParensStack = ( path, start, openParensStack ) => {
  * Strips all url param regex substrings from the route path
  *
  * @param {string} routePath
- * @returns {string}
+ * @returns {PathInfo}
  */
-const rmvPatternInfo = routePath => {
+const extractPathInfo = routePath => {
 	let path = routePath.slice();
+	const patterns = [];
 	const openParensStack = [];
 	let cursorPos = 0;
 	do {
 		const closedSegmentRange = manageParensStack( path, cursorPos, openParensStack );
-		if( closedSegmentRange === null ) {
-			return path;
-		}
+		if( closedSegmentRange === null ) { return { path, patterns } }
 		const { close, open } = closedSegmentRange;
-		cursorPos = open;
+		const value = `${ path.slice( open, close ) }`;
+		patterns.push({
+			posInRoute: routePath.indexOf( value, open ) + 1,
+			value: value.slice( 1 )
+		});
 		path = `${ path.slice( 0, open ) }${ path.slice( close + 1 ) }`
+		cursorPos = open;
 	} while( true );
 };
 
-export default rmvPatternInfo;
+export default extractPathInfo;
 
 /** @typedef {import("../helpers").TopStackBlock} TopStackBlock */
+
+/**
+ * @typedef {{
+ * 	path: string,
+ * 	patterns: Array<{
+ * 		posInRoute: number,
+ * 		value: string
+ * 	}>
+ * }} PathInfo
+ */
