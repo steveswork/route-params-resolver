@@ -52,7 +52,7 @@ const INPUT_LIST = Object.freeze([{
 	uri: '/test/demo/undefined/null'
 }, {
 	args: [ 1, null, 3, { a: 'b' }, undefined ],
-	path: '/test/demo/:first/:second([a-f0-9])/:third([A-Za-z]{24})?/:fourth',
+	path: '/test/demo/:first/:second([A-Za-z]{3,})/:third([a-f0-9])?/:fourth',
 	test: 11,
 	uri: '/test/demo/1/null/3/{"a":"b"}'
 }, {
@@ -96,4 +96,58 @@ describe( 'RouteParamsResolver', () => {
 			expect( resolve( path, ...args ) ).toEqual( uri )
 		}
 	);
-});
+
+	describe( 'optional paths', () => {
+		test.concurrent.each(
+			[{
+				args: [ undefined, null, null, undefined, undefined ],
+				path: '/test/demo/:first/:second?/:third/:fourth',
+				test: 101,
+				uri: '/test/demo/undefined/null/null'
+			}, {
+				args: [ undefined, undefined, null, undefined, undefined ],
+				path: '/test/demo/:first/:second?/:third/:fourth',
+				test: 102,
+				uri: '/test/demo/undefined/undefined/null'
+			}, {
+				args: [ undefined, , null, undefined, undefined ],
+				path: '/test/demo/:first/:second?/:third/:fourth',
+				test: 103,
+				uri: '/test/demo/undefined/undefined/null'
+			}, {
+				args: [ undefined, , null, undefined, undefined ],
+				path: '/test/demo/:first/:second/:third/:fourth',
+				test: 104,
+				uri: '/test/demo/undefined/undefined/null'
+			}].map(
+				({ args, path, test, uri }) => [ test, path, args, uri ]
+			)
+		)(	
+			'TEST #%i: resolve(%s, ...%s) => %s',
+			async ( test, path, args, uri ) => {
+				expect( resolve( path, ...args ) ).toEqual( uri )
+			}
+		)
+	} );
+
+	describe( 'regex validation', () => {
+		test( 'accepts constant - see :third pathVariable.', () => {
+			const args = [ 1, '0ab24', 'd', { a: 'b' }, undefined ];
+			const path = '/test/demo/:first/:second(^[a-f0-9]+$)/:third(d)?/:fourth';
+			const uri = resolve( path, ...args );
+			expect( uri ).not.toEqual( '/test/demo/1/0ab24/3/{"a":"b"}' );
+			expect( uri ).toEqual( '/test/demo/1/0ab24/d/{"a":"b"}' );
+		});
+		test( 'accepts escape sequences - see :third pathVariable.', () => {
+			const args = [ 1, '0ab24', 3077, { a: 'b' }, undefined ];
+			const path = '/test/demo/:first/:second(^[a-f0-9]+$)/:third(\\d{4})?/:fourth';
+			expect( resolve( path, ...args ) ).toEqual( '/test/demo/1/0ab24/3077/{"a":"b"}' )
+		});
+		test( 'throws upon encountering regex failure', () => {
+			const args = [ 1, 'null', 3, { a: 'b' }, undefined ];
+			const path = '/test/demo/:first/:second(^[a-f0-9]+$)/:third([A-Za-z]{24})?/:fourth';
+			expect(() => resolve( path, ...args )).toThrow( 'RegExp validation failed for param :second' )
+		});
+	} );
+
+} );
