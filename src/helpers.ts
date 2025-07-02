@@ -1,3 +1,5 @@
+import { PathInfo } from '.';
+
 const DANGLING_RANGE_PARAM_CONNECTOR_PATTERN = /[\.\-]$/;
 const ROUTE_PARAM_GLOBAL_PATTERN = /:[^:\/]+/g;
 const UNDEFINED_URI_ENDINGS_PATTERN = (
@@ -5,13 +7,12 @@ const UNDEFINED_URI_ENDINGS_PATTERN = (
 );
 const VARIADIC_PATTERN = /\/\*\s*$/;
 
-/**
- * @param {string} routePath
- * @param {PathInfo} info
- * @param {Array<string>} params
- * @param {Array} args
- */
-export function applyRegexValidation( routePath, info, params, args ) {
+export function applyRegexValidation(
+	routePath : string,
+	info : PathInfo,
+	params : Array<string>,
+	args : Array<string>
+) {
 	let pIndex = 0;
 	while( info.patterns.length ) {
 		const pInfo = info.patterns.shift();
@@ -38,21 +39,18 @@ export function applyRegexValidation( routePath, info, params, args ) {
 	}
 }
 
-/** @type {(routePath: string) => string[]} */
-export const getRouteParams = routePath => ((
+export const getRouteParams = ( routePath : string ) : Array<string> => ((
 	routePath.match( ROUTE_PARAM_GLOBAL_PATTERN ) || []
 ).map( p => DANGLING_RANGE_PARAM_CONNECTOR_PATTERN.test( p )
 	? p.slice( 0, p.length - 1 )
 	: p
 ) );
 
-/**
- * @param {string} routePath
- * @param {Array<string>} params
- * @param {Array<ArgType>} args
- * @returns {string}
- */
-export function route2Uri( routePath, params, args ) {
+export function route2Uri(
+	routePath : string,
+	params : Array<string>,
+	args : Array<string>
+) {
 	const _args = args.slice();
 	let path = routePath;
 	_args.length = params.length;
@@ -66,12 +64,8 @@ export function route2Uri( routePath, params, args ) {
 		: path;
 }
 
-/**
- * Removes all `undefined` path endings
- *
- * @type {(uri: string) => string}
- */
-export function trimUri( uri ) {
+/** Removes all `undefined` path endings */
+export function trimUri( uri : string ) {
 	let _uri = uri.replace( /\/+$/, '' );
 	while( true ) {
 		const exUri = _uri;
@@ -82,12 +76,3 @@ export function trimUri( uri ) {
 	}
 	return _uri;
 }
-
-/** @typedef {*} ArgType */
-
-/**
- * @typedef {{
- * 		close: number,
- * 		open: number
- * }} TopStackBlock
- */
