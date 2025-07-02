@@ -14,13 +14,29 @@ import {
 const pathParamNamesMemo = new TimedMap();
 const uriMemo = new TimedMap();
 
-/**
- * @param {string} routePath
- * @param {...ArgType} routeArgs
- * @returns {string}
- */
-const resolve = ( routePath, ...routeArgs ) => {
-	/** @type {PathInfo} */ let info;
+
+
+export interface PatternInfo {
+	posInRoute : number;
+	value : string;
+}
+
+export interface PathInfo {
+	path : string,
+	patterns: Array<PatternInfo>
+}
+
+export type ArgType = unknown;
+export interface TopStackBlock {
+	close : number;
+	open : number;
+}
+
+function resolve(
+	routePath : string,
+	...routeArgs : Array<ArgType>
+) : string {
+	let info : PathInfo;
 	if( !pathParamNamesMemo.has( routePath ) ) {
 		info = extractPathInfo( routePath );
 		pathParamNamesMemo.put(
@@ -33,7 +49,7 @@ const resolve = ( routePath, ...routeArgs ) => {
 			? JSON.stringify( arg )
 			: !isString( arg )
 				? `${ arg }`
-				: arg
+				: arg as string
 	) );
 	info = info || extractPathInfo( routePath );
 	const paramNames = pathParamNamesMemo.get( routePath );
@@ -49,5 +65,3 @@ const resolve = ( routePath, ...routeArgs ) => {
 
 export default resolve;
 
-/** @typedef {import("./helpers").ArgType} ArgType */
-/** @typedef {import("./utils/extract-path-info").PathInfo} PathInfo */

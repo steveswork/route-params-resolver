@@ -1,3 +1,5 @@
+import { PathInfo, TopStackBlock } from '..';
+
 /**
  * Reads the `path` string starting from `start`, populates
  * `openParensStack` array with indexes of all open parens
@@ -5,13 +7,12 @@
  * of first closed segment found within the block.
  *
  * -Mutates the `openParensStack` parameter
- *
- * @param {string} path
- * @param {number} start
- * @param {number[]} openParensStack
- * @returns {TopStackBlock}
  */
-const manageParensStack = ( path, start, openParensStack ) => {
+function manageParensStack(
+	path : string,
+	start : number,
+	openParensStack : Array<number>
+) : TopStackBlock {
 	for( let pos = start; pos < path.length; pos++ ) {
 		if( path[ pos ] === '(' ) {
 			openParensStack.push( pos );
@@ -27,13 +28,8 @@ const manageParensStack = ( path, start, openParensStack ) => {
 	return null;
 };
 
-/**
- * Strips all url param regex substrings from the route path
- *
- * @param {string} routePath
- * @returns {PathInfo}
- */
-const extractPathInfo = routePath => {
+/** Strips all url param regex substrings from the route path */
+function extractPathInfo( routePath : string ) : PathInfo {
 	let path = routePath.slice();
 	const patterns = [];
 	const openParensStack = [];
@@ -50,18 +46,6 @@ const extractPathInfo = routePath => {
 		path = `${ path.slice( 0, open ) }${ path.slice( close + 1 ) }`
 		cursorPos = open;
 	} while( true );
-};
+}
 
 export default extractPathInfo;
-
-/** @typedef {import("../helpers").TopStackBlock} TopStackBlock */
-
-/**
- * @typedef {{
- * 	path: string,
- * 	patterns: Array<{
- * 		posInRoute: number,
- * 		value: string
- * 	}>
- * }} PathInfo
- */

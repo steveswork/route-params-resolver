@@ -97,7 +97,7 @@ describe( 'RouteParamsResolver', () => {
 		}
 	);
 
-	describe( 'optional paths', () => {
+	describe( 'optional non-regex paths', () => {
 		test.concurrent.each(
 			[{
 				args: [ undefined, null, null, undefined, undefined ],
@@ -123,7 +123,7 @@ describe( 'RouteParamsResolver', () => {
 				({ args, path, test, uri }) => [ test, path, args, uri ]
 			)
 		)(	
-			'TEST #%i: resolve(%s, ...%s) => %s',
+			'TEST #%i: has no effect resolving(%s, ...%s) => %s',
 			async ( test, path, args, uri ) => {
 				expect( resolve( path, ...args ) ).toEqual( uri )
 			}
@@ -144,10 +144,37 @@ describe( 'RouteParamsResolver', () => {
 			expect( resolve( path, ...args ) ).toEqual( '/test/demo/1/0ab24/3077/{"a":"b"}' )
 		});
 		test( 'throws upon encountering regex failure', () => {
-			const args = [ 1, 'null', 3, { a: 'b' }, undefined ];
+			const args = [ 1, null, 3, { a: 'b' }, undefined ];
 			const path = '/test/demo/:first/:second(^[a-f0-9]+$)/:third([A-Za-z]{24})?/:fourth';
 			expect(() => resolve( path, ...args )).toThrow( 'RegExp validation failed for param :second' )
 		});
+		describe( 'optional paths', () => {
+			test( 'resolves for valid arg', () => {
+				const args = [ 1, '0ab24', 3077, { a: 'b' }, undefined ];
+				const path = '/test/demo/:first/:second(^[a-f0-9]+$)?/:third(\\d{4})?/:fourth';
+				expect( resolve( path, ...args ) ).toEqual( '/test/demo/1/0ab24/3077/{"a":"b"}' )
+			} );
+			test( 'accepts empty arg', () => {
+				const args = [ 1, , 3077, { a: 'b' }, undefined ];
+				const path = '/test/demo/:first/:second(^[a-f0-9]+$)?/:third(\\d{4})?/:fourth';
+				expect( resolve( path, ...args ) ).toEqual( '/test/demo/1/undefined/3077/{"a":"b"}' )
+			} );
+			test( 'accepts "undefined" arg', () => {
+				const args = [ 1, undefined, 3077, { a: 'b' }, undefined ];
+				const path = '/test/demo/:first/:second(^[a-f0-9]+$)?/:third(\\d{4})?/:fourth';
+				expect( resolve( path, ...args ) ).toEqual( '/test/demo/1/undefined/3077/{"a":"b"}' )
+			} );
+			test( 'throws upon encountering null', () => {
+				const args = [ 1, null, 3, { a: 'b' }, undefined ];
+				const path = '/test/demo/:first/:second(^[a-f0-9]+$)?/:third([A-Za-z]{24})?/:fourth';
+				expect(() => resolve( path, ...args )).toThrow( 'RegExp validation failed for param :second' )
+			} );
+			test( 'throws upon invalid arg', () => {
+				const args = [ 1, null, 3, { a: 'b' }, undefined ];
+				const path = '/test/demo/:first/:second(^[a-f0-9]+$)?/:third([A-Za-z]{24})?/:fourth';
+				expect(() => resolve( path, ...args )).toThrow( 'RegExp validation failed for param :second' )
+			});
+		} );
 	} );
 
 } );
